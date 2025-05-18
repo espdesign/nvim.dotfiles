@@ -19,12 +19,19 @@ set.softtabstop = 4  -- Number of spaces that <Tab> counts for while performing 
 
 -- Keymap to run the current Python file using `uv run %`
 -- This is a buffer-local mapping, non-recursive, and silent.
-vim.keymap.set('n', '<leader>ru', '<cmd>!uv run %<CR>', {
-  buffer = true,
-  noremap = true,
-  silent = true,
-  desc = "Run current file with uv"
+vim.keymap.set('n', '<leader>ruv', '<cmd>!uv run %<CR>', {
+    buffer = true,
+    noremap = true,
+    silent = true,
+    desc = "Run current file with uv"
 })
+vim.keymap.set('n', '<leader>rbl', '<cmd>!black %<CR>', {
+    buffer = true,
+    noremap = true,
+    silent = true,
+    desc = "Run current file with black formatter"
+})
+
 
 -- ----------------------------------------------------------------------------
 -- Notes on Virtual Environments, LSP, Formatting, and Linting with UV
@@ -97,5 +104,3 @@ vim.keymap.set('n', '<leader>ru', '<cmd>!uv run %<CR>', {
 -- (Note: DAP setup is more involved and mostly global, these are just example keymaps)
 -- vim.keymap.set('n', '<LocalLeader>db', function() require('dap').toggle_breakpoint() end, { buffer = true, noremap = true, silent = true, desc = "DAP: Toggle breakpoint" })
 -- vim.keymap.set('n', '<LocalLeader>dc', function() require('dap').continue() end, { buffer = true, noremap = true, silent = true, desc = "DAP: Continue" })
-
-vim.notify("Python ftplugin loaded (uv-focused)", vim.log.levels.INFO, { title = "Neovim" })

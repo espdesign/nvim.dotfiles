@@ -14,23 +14,29 @@ return {
     },
     config = function()
       local capabilities = require('blink.cmp').get_lsp_capabilities()
-      require("lspconfig").lua_ls.setup { capabilites = capabilities }
-      require("lspconfig").basedpyright.setup({
+      require("lspconfig").lua_ls.setup { capabilities = capabilities } -- Fix typo here (capabilites -> capabilities)
+      require('lspconfig').ruff.setup({
+        init_options = {
+          settings = {
+            logLevel = "debug" -- Ruff language server settings go here
+          }
+        }
+      })
+      require('lspconfig').pyright.setup({
         capabilities = capabilities,
         settings = {
-          basedpyright = {
-            typeCheckingMode = "basic", -- or "strict", your choice
-            venvPath = ".",
-            venv = ".venv",
+          pyright = {
+            -- Using Ruff's import organizer
+            disableOrganizeImports = true,
+          },
+          python = {
             analysis = {
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
-              diagnosticMode = "workspace",
+              -- Ignore all files for analysis to exclusively use Ruff for linting
+              ignore = { '*' },
             },
           },
         },
       })
-
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
           local c = vim.lsp.get_client_by_id(args.data.client_id)
@@ -46,6 +52,20 @@ return {
             })
           end
         end,
+      })
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client == nil then
+            return
+          end
+          if client.name == 'ruff' then
+            -- Disable hover in favor of Pyright
+            client.server_capabilities.hoverProvider = false
+          end
+        end,
+        desc = 'LSP: Disable hover capability from Ruff',
       })
     end,
   }
