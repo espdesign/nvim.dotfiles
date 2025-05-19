@@ -14,7 +14,7 @@ return {
     },
     config = function()
       local capabilities = require('blink.cmp').get_lsp_capabilities()
-      require("lspconfig").lua_ls.setup { capabilities = capabilities } -- Fix typo here (capabilites -> capabilities)
+      require("lspconfig").lua_ls.setup { capabilities = capabilities, } -- Fix typo here (capabilites -> capabilities)
       require('lspconfig').ruff.setup({
         init_options = {
           settings = {
@@ -29,43 +29,36 @@ return {
             -- Using Ruff's import organizer
             disableOrganizeImports = true,
           },
-          python = {
-            analysis = {
-              -- Ignore all files for analysis to exclusively use Ruff for linting
-              ignore = { '*' },
-            },
-          },
+          -- python = {
+          --   analysis = {
+          --     -- Ignore all files for analysis to exclusively use Ruff for linting
+          --     ignore = { '*' },
+          --   },
+          -- },
         },
       })
-      vim.api.nvim_create_autocmd('LspAttach', {
-        callback = function(args)
-          local c = vim.lsp.get_client_by_id(args.data.client_id)
-          if not c then return end
 
-          if c.supports_method('textDocument/formatting') then
-            -- Format the current buffer on save
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('lsp_attach_handler', { clear = true }),
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if not client then return end
+
+          -- Disable Ruff hover
+          if client.name == 'ruff' then
+            client.server_capabilities.hoverProvider = false
+          end
+
+          -- Enable format-on-save
+          if client.supports_method('textDocument/formatting') then
             vim.api.nvim_create_autocmd('BufWritePre', {
               buffer = args.buf,
               callback = function()
-                vim.lsp.buf.format({ bufnr = args.buf, id = c.id })
+                vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
               end,
             })
           end
         end,
-      })
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
-        callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if client == nil then
-            return
-          end
-          if client.name == 'ruff' then
-            -- Disable hover in favor of Pyright
-            client.server_capabilities.hoverProvider = false
-          end
-        end,
-        desc = 'LSP: Disable hover capability from Ruff',
       })
     end,
   }
