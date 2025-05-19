@@ -10,8 +10,8 @@ set.expandtab = true -- Use spaces instead of tabs
 set.tabstop = 4      -- Number of spaces that a <Tab> in the file counts for
 set.shiftwidth = 4   -- Number of spaces to use for each step of (auto)indent
 set.softtabstop = 4  -- Number of spaces that <Tab> counts for while performing editing operations
--- vim.bo.textwidth = 88      -- Optional: Set preferred line length (e.g., for black or ruff)
--- vim.bo.colorcolumn = "+1"  -- Optional: Show a color column at textwidth + 1
+set.relativenumber = true-- vim.bo.textwidth = 88      -- Optional: Set preferred line length (e.g., for black or ruff)
+set.number= true-- vim.bo.colorcolumn = "+1"  -- Optional: Show a color column at textwidth + 1
 
 -- ----------------------------------------------------------------------------
 -- UV Integration and Keymappings
